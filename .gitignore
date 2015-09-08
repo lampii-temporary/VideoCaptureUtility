@@ -41,3 +41,14 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+Debug/
+Release/
+obj/
+VideoCaptureUtility.opensdf
+VideoCaptureUtility.v12.suo
+VideoCaptureUtility.sdf
+VideoCaptureUtility/VideoCaptureUtility/bin
+VideoCaptureUtility/VideoCaptureUtility/obj
+VideoCaptureUtility/videoInputDLL/Debug
+VideoCaptureUtility/videoInputDLL/Release
+VideoCaptureUtility1.v12.suo
