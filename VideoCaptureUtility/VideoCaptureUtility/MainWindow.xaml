@@ -2,10 +2,10 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="480" Width="640"
-        xmlns:local="clr-namespace:OculusFPV.Launcher"
+        xmlns:local="clr-namespace:OculusFPV.Launcher" Closing="Window_Closing"
         >
-
-    <local:CaptureControl x:Name="captureControl" />
+    <local:MainControl x:Name="mainControl"/>
+    <!--<local:CaptureControl x:Name="captureControl" />-->
 
 
 </Window>

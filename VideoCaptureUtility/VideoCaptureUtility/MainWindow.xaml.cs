@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Runtime.InteropServices;
 using System.IO;
+using System.Threading;
 namespace OculusFPV.Launcher
 {
 
@@ -53,6 +54,13 @@ namespace OculusFPV.Launcher
             InitializeComponent();
 
           
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            LatencyTesterVM.Instance.KillPreview();
+
+            VideoCaptureManager.Instance.StopCapture();
         }
     }
 

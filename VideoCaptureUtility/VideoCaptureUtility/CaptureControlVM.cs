@@ -333,7 +333,7 @@ namespace OculusFPV.Launcher
         {
             LatencyTesterWindow ltWin = new LatencyTesterWindow();
             LatencyTestView testView = new LatencyTestView();
-            testView.Show();
+            //testView.Show();
             //ltWin.ChangeBrush(LatencyTesterWindow.BColor.White);
             //Thread.Sleep(2000);
             //ltWin.ChangeBrush(LatencyTesterWindow.BColor.Red);

@@ -1,0 +1,12 @@
+﻿<Window x:Class="OculusFPV.Launcher.PreviewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="PreviewWindow" Height="300" Width="300" Closing="Window_Closing" Loaded="Window_Loaded">
+    <Grid>
+        <Label Content="ID" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+        <Label Name="nameLabel" Content="Name:" HorizontalAlignment="Left" Margin="52,10,0,0" VerticalAlignment="Top" Width="230"/>
+        <Label Name="idValLabel" Content="1" HorizontalAlignment="Left" Margin="32,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="2.818,0.654" Width="15"/>
+        <Image Name="image" HorizontalAlignment="Stretch" Margin="10,50,10,10" VerticalAlignment="Stretch"/>
+
+    </Grid>
+</Window>

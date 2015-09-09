@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OculusFPV.Launcher;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -46,28 +47,56 @@ namespace OculusFPV.Launcher
             throw new NotImplementedException();
         }
     }
-    public class LatencyTesterVM: INotifyPropertyChanged
+    public sealed class LatencyTesterVM: INotifyPropertyChanged
     {
+        private static readonly LatencyTesterVM instance = new LatencyTesterVM();
+        public static LatencyTesterVM Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged(string e)
         {
             if (PropertyChanged != null)
             {
-                Console.WriteLine(e + " changed");
+               // Console.WriteLine(e + " changed");
                 PropertyChanged(this, new PropertyChangedEventArgs(e));
             }
         }
-       public  struct RGBVal
+
+        /// <summary>
+        /// Because Wpf doesn't want structs..
+        /// </summary>
+        public class RGBVal : INotifyPropertyChanged
         {
-          public  int r, b, g;
+            public event PropertyChangedEventHandler PropertyChanged;
+            public void OnPropertyChanged(string e)
+            {
+                if (PropertyChanged != null)
+                {
+                    Console.WriteLine(e + " changed");
+                    PropertyChanged(this, new PropertyChangedEventArgs(e));
+                }
+            }
+        
+            int r=0, b=0, g=0;
+            public RGBVal()
+            { }
+            public RGBVal(int R,int B, int G)
+            {
+                r = R; 
+                b = B; 
+                g = G;
+            }
+            public int R { get{ return r;} set{ r = value; OnPropertyChanged("R"); }}
+            public int B { get{ return b;} set{ b = value; OnPropertyChanged("B"); }}
+            public int G { get{ return g;} set{ g = value; OnPropertyChanged("G"); }}
+
         }
 
-        public enum BGColors
-        {
-            Black,
-            White,
-            Red,
-        }
         #region Members
 
         bool alwaysSample = true;
@@ -83,27 +112,59 @@ namespace OculusFPV.Launcher
                 OnPropertyChanged("AlwaysSample");
             }
         }
+        PreviewWindow previewWindow;
+
+        public void PreviewPressed()
+        {
+
+            if (previewWindow != null)
+            {
+                try
+                {
+                    previewWindow.Close();
+                    previewWindow = null; 
+                }
+                catch (Exception) { }
+            }
+           
+                previewWindow = new PreviewWindow();
+                previewWindow.Show();
+
+
+        }
+        public void KillPreview()
+        {
+            if(previewWindow != null)
+            {
+                try
+                {
+                    previewWindow.Close();
+                    previewWindow = null;
+                }
+                catch (Exception) { }
+            }
+        }
         RGBVal colorThreshold;
         RGBVal colorAverage;
         Stopwatch stopwatch;
-        int latencyRunningAvg;
-        CaptureControlVM captureControl;
+
         #endregion
         public LatencyTesterVM()
         {
             //captureControl = control;
-            m_colorList = new List<string>();
-            m_colorList = Enum.GetNames(typeof(BGColors)).ToList();
             stopwatch = new Stopwatch();
             rectColor = Brushes.DarkGray;
             colorThreshold = new RGBVal();
-            colorThreshold.r = 150;
-            colorThreshold.g = 0;
-            colorThreshold.b = 0;
+            colorThreshold.R = 150;
+            colorThreshold.G = 0;
+            colorThreshold.B = 0;
             colorAverage = new RGBVal();
-            colorAverage.r = 0;
-            colorAverage.g = 0;
-            colorAverage.b = 0;
+            colorAverage.R = 0;
+            colorAverage.G = 0;
+            colorAverage.B = 0;
+            BaseColor = Brushes.Black;
+            TestColor = Brushes.Red;
+       //     VideoCaptureManager.Instance.AddCallback(sampleGreaterThan);
         }
         public RGBVal ColorThresh
         {
@@ -117,6 +178,17 @@ namespace OculusFPV.Launcher
                 OnPropertyChanged("ColorThresh");
 
             }
+        }
+        Brush baseColor, testColor;
+        public System.Windows.Media.Brush TestColor
+        {
+            get { return testColor; }
+            set { testColor = value; OnPropertyChanged("TaseColor"); }
+        }
+        public System.Windows.Media.Brush BaseColor
+        {
+            get { return baseColor; }
+            set { baseColor = value; OnPropertyChanged("BaseColor"); }
         }
         public RGBVal ColorAverage
         {
@@ -161,32 +233,31 @@ namespace OculusFPV.Launcher
         {
 
         }
-
-        /// <summary>
-        /// Runs a ColorSampler and updates the avreage on the GUI
-        /// </summary>
-        public void _sampleThread()
+        public int sampleLessThan(byte[] array)
         {
-           while(AlwaysSample)
-           {
-               RGBVal result= ColorSampler.Sample3Channels((BitmapSource)captureControl.Image);
-               try
-               {
-                   Application.Current.Dispatcher.BeginInvoke(
-                 DispatcherPriority.Background,
-                 new Action(() =>
-                 {
-                     ColorAverage = result;
+            RGBVal sample = ColorSampler.Sample3Channels(array, VideoCaptureManager.Instance.ImageWidth, VideoCaptureManager.Instance.ImageHeight);
+            this.ColorAverage = sample;
+            if(sample.R < ColorThresh.R && sample.G < ColorThresh.G && sample.B < ColorThresh.B)
+            {
+                return 1;
+            }
 
-                 }));
-                 
-               }
-               catch (Exception e)
-               {
-                   Console.WriteLine(e);
-               }
-           }
+            return 0;
         }
+        public int sampleGreaterThan(byte[] array)
+        {
+            RGBVal sample = ColorSampler.Sample3Channels(array, VideoCaptureManager.Instance.ImageWidth, VideoCaptureManager.Instance.ImageHeight);
+            this.ColorAverage = sample;
+            if (sample.R > ColorThresh.R && sample.G > ColorThresh.G && sample.B > ColorThresh.B)
+            {
+                VideoCaptureManager.Instance.RemoveCallback(sampleGreaterThan);
+                return 1;
+            }
+
+            return 0;
+        }
+  
+    
     }
     public class ColorSampler
     {
@@ -207,40 +278,40 @@ namespace OculusFPV.Launcher
             int height = (int)source.Height ;
             int size = width * height;
             byte[] pixels = new byte[size];
-            for (int i = 0; i < size; i+=3 )
+            for (int i = 0; i < size; i+=2 )
             {
-                sum.r += pixels[i];
-                sum.b += pixels[i];
-                sum.g += pixels[i];
+                sum.R += pixels[i];
+                sum.G += pixels[i];
+                sum.B += pixels[i];
                 count++;
             }
                 //TODO Stop assuming RGB format
-            result.r = sum.r / count;
-            result.b = sum.b / count;
-            result.g = sum.g / count;
+            result.R = sum.R / count;
+            result.G = sum.G / count;
+            result.B = sum.B / count;
             return result;
         }
         public static LatencyTesterVM.RGBVal Sample3Channels( byte[] image, int width, int height)
         {
-            LatencyTesterVM.RGBVal result = default(LatencyTesterVM.RGBVal);// = new LatencyTesterVM.RGBVal();
-            LatencyTesterVM.RGBVal sum = default(LatencyTesterVM.RGBVal);// = new LatencyTesterVM.RGBVal();
+            LatencyTesterVM.RGBVal result = new LatencyTesterVM.RGBVal();
+            LatencyTesterVM.RGBVal sum = new LatencyTesterVM.RGBVal();
 
             int count= 0;
 
            
             int size = width * height;
-            byte[] pixels = new byte[size];
-            for (int i = 0; i < size; i+=3 )
+  
+            for (int i = 0; i < size / 2; i += 3)
             {
-                sum.r += pixels[i];
-                sum.b += pixels[i];
-                sum.g += pixels[i];
+                sum.R += image[i+2];
+               // sum.G += (byte) image[i+1];
+            //    sum.B += image[i];
                 count++;
             }
-                //TODO Stop assuming RGB format
-            result.r = sum.r / count;
-            result.b = sum.b / count;
-            result.g = sum.g / count;
+            //TODO Stop assuming RGB format
+            result.R = sum.R / count;
+          //  result.G = sum.G / count;
+        //    result.B = sum.B / count;
             return result;
         }
         

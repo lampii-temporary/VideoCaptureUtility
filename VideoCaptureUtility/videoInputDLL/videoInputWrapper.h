@@ -49,9 +49,9 @@ extern "C"
 		{
 			return VI.getSize(devId);
 		}
-		_VI_API void SetFormat(int devId, int format)
+		_VI_API bool SetFormat(int devId, int format)
 		{
-			VI.setFormat( devId,  format);
+			return VI.setFormat( devId,  format);
 		}
 
 		_VI_API bool IsFrameReady(int devId)
@@ -77,6 +77,7 @@ extern "C"
 			VI.setupDevice(devId, width, height, connectionType);
 
 		}
+
 		_VI_API void ShowSettingsWindow(int devId)
 		{
 			VI.showSettingsWindow(devId);
@@ -89,10 +90,12 @@ extern "C"
 		{
 			VI.setRequestedMediaSubType(mediaType);
 		}
+
 		_VI_API void SetIdealFramerate(int devId, int fps)
 		{
 			VI.setIdealFramerate(devId, fps);
 		}
+
 		_VI_API void SetUseCallback(bool useCallback)
 		{
 			VI.setUseCallback(useCallback);

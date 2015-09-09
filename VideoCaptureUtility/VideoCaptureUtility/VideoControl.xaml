@@ -1,0 +1,38 @@
+﻿<UserControl x:Class="OculusFPV.Launcher.VideoControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             xmlns:local="clr-namespace:OculusFPV.Launcher.ValueConverters"
+             d:DesignHeight="400" d:DesignWidth="600" Unloaded="UserControl_Unloaded">
+    <UserControl.Resources>
+        <local:EnumToStringConverter x:Key="EnumToStringConverter"/>
+        <BitmapImage x:Key="noVideo" UriSource="Media/novideo.png"/>
+        <BitmapImage x:Key="reloadIcon" UriSource="Media/reload.png"/>
+        <BitmapImage x:Key="videoIcon" UriSource="Media/VideoIcon.jpg"/>
+    
+    </UserControl.Resources>
+    <Grid Background="White">
+        <ToggleButton Name="startButton" Content="Start" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Height="22" Click="startButton_Click" Checked="startButton_Checked" Unchecked="startButton_Unchecked"/>
+        <ComboBox Name="deviceListCombo" ItemsSource="{Binding DeviceList}" SelectedIndex="{Binding DeviceID,Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="90,10,42,0" VerticalAlignment="Top">
+        </ComboBox>
+        <Button Name="refreshBtn"  Margin="0,10,10,0" VerticalAlignment="Top" Height="22" HorizontalAlignment="Right" Width="27" Click="refreshBtn_Click">
+            <StackPanel>
+                <Image Source="{StaticResource reloadIcon}" Height="20"/>
+            </StackPanel>
+        </Button>
+        <Image HorizontalAlignment="Left" Height="232" Margin="73,132,0,0" VerticalAlignment="Top" Width="468"/>
+        <Label Content="Interface" HorizontalAlignment="Left" Margin="29,37,0,0" VerticalAlignment="Top"/>
+        <ComboBox ItemsSource="{Binding PhysicalTypeList}" SelectedItem="{Binding RequestedPhysicalType, Converter={StaticResource EnumToStringConverter} }" HorizontalAlignment="Left" Margin="91,37,0,0" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Format" HorizontalAlignment="Left" Margin="216,37,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.25,-0.654"/>
+        <ComboBox ItemsSource="{Binding FormatTypeList}" SelectedItem="{Binding RequestedFormatType,Converter={StaticResource EnumToStringConverter}}" HorizontalAlignment="Left" Margin="269,37,0,0" VerticalAlignment="Top" Width="120"/>
+        <Label Content="Media" HorizontalAlignment="Left" Margin="394,37,0,0" VerticalAlignment="Top" Width="48"/>
+        <ComboBox HorizontalAlignment="Left"  ItemsSource="{Binding MediaTypeList}" SelectedItem="{Binding RequestedMediaType,Converter={StaticResource EnumToStringConverter}}"  Margin="438,37,0,0" VerticalAlignment="Top" Width="120"/>
+        <Label Content="FPS:" HorizontalAlignment="Left" Margin="509,64,0,0" VerticalAlignment="Top"/>
+        <Label Name="fpsValLabel" Content="{Binding FrameRate,FallbackValue=0}" HorizontalAlignment="Left" Margin="535,64,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.289,1.192"/>
+        <Label Content="Size:" HorizontalAlignment="Left" Margin="399,63,0,0" VerticalAlignment="Top" RenderTransformOrigin="-1.105,0.808"/>
+        <Label Content="{Binding ImageSize,FallbackValue=unknown, TargetNullValue=unknown}" HorizontalAlignment="Left" Margin="433,63,0,0" VerticalAlignment="Top"/>
+        <Image Source="{Binding CapturedImage}" HorizontalAlignment="Stretch" Margin="10,90,10,0" VerticalAlignment="Stretch"  />
+    </Grid>
+</UserControl>

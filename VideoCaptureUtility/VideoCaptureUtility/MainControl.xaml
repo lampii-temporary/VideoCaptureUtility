@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="OculusFPV.Launcher.MainControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             xmlns:local="clr-namespace:OculusFPV.Launcher"
+             d:DesignHeight="480" d:DesignWidth="640">
+    <UserControl.Resources>
+        <BitmapImage x:Key="timerIcon" UriSource="Media/timer.png"/>
+
+        <BitmapImage x:Key="VideoIcon" UriSource="Media/video.png"/>
+    </UserControl.Resources>
+    <Grid>
+        <TabControl Margin="0,10,0,0">
+            <TabItem Header="TabItem">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{StaticResource VideoIcon}" Width="36" Height="36"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+                <Grid Background="#FFE5E5E5">
+                    <local:VideoControl x:Name="videoControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                </Grid>
+            </TabItem> 
+            <TabItem Header="TabItem">
+                <TabItem.HeaderTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{StaticResource timerIcon}" Width="36" Height="36"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </TabItem.HeaderTemplate>
+                <Grid Background="#FFE5E5E5">
+                    <local:LatencyTestView HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</UserControl>
